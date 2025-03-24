@@ -1,0 +1,5 @@
+bot:
+  token: "iznbz95enbrpmkutm5offjntzy"
+  name: "VotelyBot"
+mattermost:
+  url: "http://localhost:8065"
