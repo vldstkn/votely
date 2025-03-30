@@ -5,6 +5,7 @@ services:
       dockerfile: cmd/votely/Dockerfile
     environment:
       - APP_ENV=dev
+    restart: always
     networks:
       - dev
     depends_on:

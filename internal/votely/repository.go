@@ -68,7 +68,7 @@ func (repo *Repository) Create(userId, title string, options []string) (*uint, e
 		repo.Logger.Error("Empty response", slog.String("location", opt+"response handling"))
 		return nil, errors.New("transaction failed")
 	}
-	rawId, ok := resp[0].(uint8)
+	rawId, ok := resp[0].(int8)
 
 	if !ok {
 		repo.Logger.Error("Invalid ID type",
