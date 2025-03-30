@@ -1,4 +1,14 @@
 services:
+  bot:
+    build:
+      context: .
+      dockerfile: cmd/votely/Dockerfile
+    environment:
+      - APP_ENV=dev
+    networks:
+      - dev
+    depends_on:
+      - mattermost
   db:
     image: postgres:latest
     container_name: mattermost_db
@@ -9,20 +19,20 @@ services:
       - POSTGRES_DB=mattermost
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    networks:
+      - dev
 
   mattermost:
     image: mattermost/mattermost-team-edition:latest
     container_name: mattermost
     restart: always
-    extra_hosts:
-      - "localhost:host-gateway"
+#    extra_hosts:
+#      - "localhost:host-gateway"
     ports:
       - "8065:8065"
     environment:
       - MM_SQLSETTINGS_DATASOURCE=postgres://user:123456@db/mattermost?binary_parameters=yes&connect_timeout=10&sslmode=disable
-      - MM_SERVICESETTINGS_ALLOWEDUNTRUSTEDINTERNALCONNECTIONS=0.0.0.0,host.docker.internal,localhost,127.0.0.1
+      - MM_SERVICESETTINGS_ALLOWEDUNTRUSTEDINTERNALCONNECTIONS=bot,0.0.0.0,host.docker.internal,localhost,127.0.0.1
     volumes:
       - mattermost_data:/mattermost/data
       - mattermost_logs:/mattermost/logs
@@ -30,18 +40,20 @@ services:
       - mattermost_plugins:/mattermost/plugins
     depends_on:
       - db
+    networks:
+      - dev
   tarantool:
     image: tarantool/tarantool:latest
     container_name: tarantool
     restart: always
-    ports:
-      - "3301:3301"
     volumes:
       - tarantool_data:/var/lib/tarantool
       - ./init.lua:/init.lua
     environment:
       TARANTOOL_WORKDIR: /var/lib/tarantool
       TARANTOOL_INSTANCE_NAME: instance-001
+    networks:
+      - dev
     command: ["tarantool", "/init.lua"]
 
 volumes:
@@ -51,3 +63,6 @@ volumes:
   mattermost_config:
   mattermost_plugins:
   tarantool_data:
+networks:
+  dev:
+    driver: bridge

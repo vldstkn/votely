@@ -2,13 +2,13 @@ bot:
   token: "9iwf8s3u8fyojn5fe3eh3xcepa"
   name: "VotelyBot"
   address:
-    host: "localhost"
+    host: "bot"
     port: "6754"
 mattermost:
-  url: "http://localhost:8065"
+  url: "http://mattermost:8065"
   teamName: "dev"
 database:
   tarantool:
-    address: "localhost:3301"
+    address: "tarantool:3301"
     user: "guest"
     password: ""
