@@ -16,10 +16,13 @@ services:
     image: mattermost/mattermost-team-edition:latest
     container_name: mattermost
     restart: always
+    extra_hosts:
+      - "localhost:host-gateway"
     ports:
       - "8065:8065"
     environment:
       - MM_SQLSETTINGS_DATASOURCE=postgres://user:123456@db/mattermost?binary_parameters=yes&connect_timeout=10&sslmode=disable
+      - MM_SERVICESETTINGS_ALLOWEDUNTRUSTEDINTERNALCONNECTIONS=0.0.0.0,host.docker.internal,localhost,127.0.0.1
     volumes:
       - mattermost_data:/mattermost/data
       - mattermost_logs:/mattermost/logs
@@ -27,6 +30,19 @@ services:
       - mattermost_plugins:/mattermost/plugins
     depends_on:
       - db
+  tarantool:
+    image: tarantool/tarantool:latest
+    container_name: tarantool
+    restart: always
+    ports:
+      - "3301:3301"
+    volumes:
+      - tarantool_data:/var/lib/tarantool
+      - ./init.lua:/init.lua
+    environment:
+      TARANTOOL_WORKDIR: /var/lib/tarantool
+      TARANTOOL_INSTANCE_NAME: instance-001
+    command: ["tarantool", "/init.lua"]
 
 volumes:
   postgres_data:
@@ -34,3 +50,4 @@ volumes:
   mattermost_logs:
   mattermost_config:
   mattermost_plugins:
+  tarantool_data:
